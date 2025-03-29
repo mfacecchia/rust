@@ -10,6 +10,7 @@ fn main() {
     let secret_number = gen_rand();
     println!("The secret number is {secret_number}.");
 
+    // NOTE: That's a `while (true)` expression sort of. BE CAREFUL!!
     loop {
         print!("Input a random number (type \"quit\" to quit the program): ");
         // NOTE: Flushing the output stream in order to immediately printout the message
@@ -31,16 +32,10 @@ fn main() {
                 // Can compile without handling but will throw a warning.
                 .expect("Unexpected error while getting input.");
 
-        // NOTE: Using the `as_str()` method from the `String` class in order to be able to compare two `&str`
-       //  (cannot, in fact, compare `String` and `&str`)
-        match guess.trim().to_uppercase().as_str() {
-            "QUIT" => {
-                println!("Thank you for playing!");
-                break;
-            },
-            // NOTE: Default case to do nothing (e.g. continue with code normal flow)
-            // (required by rust because it needs to check all possible matches from the expression)
-            _ => ()
+        match is_quit(&guess) {
+            true => break,
+            // NOTE: Empty parenthesis means "do nothing"
+            false => ()
         };
 
         // Parsing the guess from string to a 32 bit integer value
@@ -74,4 +69,22 @@ fn main() {
 fn gen_rand() -> i32 {
     let rand = rand::rng().random_range(1..=100);
     return rand;
+}
+
+/// Checks wheter the user wants to quit the game or not
+/// ## Returns:
+///     true: the user wants to quit
+///     false: the user wants to play the game
+fn is_quit(guess: &String) -> bool {
+    // NOTE: Using the `as_str()` method from the `String` class in order to be able to compare two `&str`
+    // (cannot, in fact, compare `String` and `&str`)
+    return match guess.trim().to_uppercase().as_str() {
+        "QUIT" => {
+            println!("Thank you for playing!");
+            return true;
+        },
+        // NOTE: Default case to do nothing (e.g. continue with code normal flow)
+        // (required by rust because it needs to check all possible matches from the expression)
+        _ => false,
+    };
 }
