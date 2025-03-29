@@ -1,0 +1,25 @@
+# NOTE: Cargo is Rust's package manager.
+# It's used to manage project dependencies, as well as project information such as name, version and more
+
+# Each project is a package, means that is can be shared to anyone and used as dependency for other projects
+
+# You create a new porject with Cargo using `cargo new {project_name}` or, if already started, you can use `cargo init` 
+# and move the program in the generated `src` directory
+
+# Default location for cargo-compiled programs is `target/debug/{project_name}`
+
+# --- NOTE: Building with cargo ---
+# To build a project use `cargo build`, otherwise for build and run `cargo run`
+# If you want to check if the program compiles without producing the final compiled program (debugging purposes basically),
+# use `cargo check` instead
+# There are multiple build options in cargo. The default one is for development
+#   (produces unoptimized machine code for faster testing during development),
+# and the release profile (takes longer to compile due to optimization to make the final program run way faster).
+# For production compiled code use `cargo build --release` (will output in `/target/release`)
+
+[package]
+name = "hello_cargo"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
