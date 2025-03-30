@@ -27,14 +27,16 @@ fn main() {
         String::from("Pending"),
     )));
 
-    let final_status = process_payment(payment);
+    let final_status = process_payment(&payment);
     println!("Status: {final_status:#?}");
 
-    let no_payment = Option::None;
-    process_payment(no_payment);
+    println!("Simple payment processing.");
+    let no_payment : Option<PaymentStatus> = Option::None;
+    let result = process_payment_simple(&no_payment);
+    println!("{result:#?}");
 }
 
-fn process_payment(payment: Option<PaymentStatus>) -> PaymentStatus {
+fn process_payment(payment: &Option<PaymentStatus>) -> PaymentStatus {
     // TODO: May want to refactor this (don't like too many nestings :/)
     match payment {
         Option::None => {
@@ -65,4 +67,24 @@ fn process_payment(payment: Option<PaymentStatus>) -> PaymentStatus {
             }
         }
     }
+}
+
+/// Same functioning as `process_payment` method, but using `if let`
+fn process_payment_simple(payment: &Option<PaymentStatus>) -> PaymentStatus {
+    // NOTE: Instead of match operations, we can use some more familiar operators
+    // such as `if` or `if let`
+    // `if let` is used for tyupe checking on enums or structs, for all other cases, we use the `if`
+    // In the left side of the condition we define the type that the variable should match
+    // (in this case, `None` or `Some` since our varuable stores an `Option` enum value)
+    // If the condition matches, we continue with the operations defined in the condition
+    if let None = payment {
+        return PaymentStatus::REFUSED(StatusCodes::P400(String::from("Unknown error.")));
+    }
+    if let Some(payment) = payment {
+        if let PaymentStatus::REFUSED(_) = payment {
+            return PaymentStatus::REFUSED(StatusCodes::P400(String::from("Invalid payment method.")));
+        }
+        return PaymentStatus::PROCESSED(StatusCodes::P200(String::from("Success: true")));
+    }
+    return PaymentStatus::REFUSED(StatusCodes::P400(String::from("Unknown error.")));
 }
