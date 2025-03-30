@@ -12,11 +12,52 @@ struct User {
     age: u32,
 }
 
+// NOTE: Here, we are adding some methods to our struct.
+// Each method takes a `&self` parameter, referring to the variable calling it.
+// As seen in previous exercises, it can take ownership of the variable, or it can take a pointer (using the `&`)
+// (immutable by default, of course)
+impl User {
+    /// Formats email field to be uppercase, keeping consistent format
+    fn format_email(&mut self) -> () {
+        self.email = self.email.to_uppercase();
+    }
+
+    fn is_adult(&self) -> bool {
+        self.age >= 18
+    }
+
+    /// Builds a new User with the provided data and a uniquely generated user_id
+    /// ## Params:
+    ///     username [&str]: the username
+    ///     email [&str]: the user email
+    ///     age [u32]: the user age
+    /// ## Returns:
+    ///     User: a new User
+    fn build_user(username: &str, email: &str, age: u32) -> User {
+        return User {
+            user_id: Uuid::new_v4(),
+            email: String::from(email),
+            username: String::from(username),
+            age
+        };
+    }
+}
+
 // NOTE: Defining a Tuple Struct (a tuple with pre-defined items type definition for improved tuples reusability)
 struct Point(f32, f32, f32);
 
 fn main() {
     let mut user_1 = build_user("random@provider.com", "randomUser1", 18);
+
+    // NOTE: Here, rust recognises we are calling a struct method requiring
+    // a mutable pointer, and so automatically passes the pointer of the calling struct
+    user_1.format_email();
+
+    // Another approach to this is the following,
+    // anyways, this is less readable so not really suggested
+    // ```(&mut user_1).format_email();```
+
+    user_1.is_adult();
 
     let user_2 = User {
         user_id: Uuid::new_v4(),
@@ -24,8 +65,6 @@ fn main() {
         username: user_1.username.clone(),
         ..user_1
     };
-
-    user_1.email = user_1.email.to_uppercase();
 
     println!(
         "That's the full user information:
@@ -58,6 +97,10 @@ fn main() {
     );
 
     coords_1.0 = 2.00;
+
+    // NOTE: It is possible to return struct values directly from structs themselves
+    let built_user = User::build_user("builtUser1", "built@provider.com", 30);
+    println!("{built_user:#?}");
 }
 
 fn build_user(email: &str, username: &str, age: u32) -> User {
