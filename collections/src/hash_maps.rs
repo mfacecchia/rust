@@ -36,4 +36,36 @@ pub fn work_with_hashmaps() -> () {
     os_preferences.insert(
         String::from("MacOS"),
         PreferenceData { users_count: 100 });
+
+    for(k, v) in &os_preferences{
+        println!("{k} => {v:?}");
+    }
+
+    _ = &os_preferences.entry(String::from("Linux")).or_insert(PreferenceData { users_count: 400 });
+
+    println!("Values after update:");
+    println!("{os_preferences:#?}");
+
+    // Accessing value in HashMap and getting a mutable pointer
+    let os = os_preferences.get_mut("Windows");
+    match os {
+        Some(mut os_preference) => {
+            println!("Updating preference...");
+            increase_preference(&mut os_preference, 200);
+        }
+        None => {
+            println!("OS not found");
+        }
+    };
+
+    println!("Preference just updated!");
+    println!("{os_preferences:#?}");
+}
+
+fn increase_preference(os_preference_count: &mut PreferenceData, increase_by: u32) -> () {
+    // NOTE: When accessing data in an enum, rust automatically dereferences it for convenience
+    os_preference_count.users_count += increase_by;
+
+    // The actual code that gets executed when accessing an enum's field is the following
+    // (*os_preference_count).users_count
 }
