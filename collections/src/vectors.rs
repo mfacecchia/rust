@@ -91,4 +91,17 @@ pub fn work_with_vectors() -> () {
             }
         }
     }
+
+    let incr_by: i32 = 10;
+    println!("Increasing all vector items by {incr_by}.");
+    increase_value(&mut vector, 10);
+    println!("Updated values");
+    println!("{vector:?}");
+}
+
+fn increase_value(vec: &mut Vec<i32>, incr_by: i32) -> () {
+    vec.iter_mut().for_each(| entry | {
+        // NOTE: Explicit dereferencing here instead
+        *entry += incr_by;
+    });
 }

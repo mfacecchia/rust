@@ -1,5 +1,9 @@
-use collections::hash_maps;
+use collections;
 
 fn main() {
-    hash_maps::work_with_hashmaps();
+    println!("Working with hashmaps");
+    collections::hash_maps::work_with_hashmaps();
+
+    println!("Working with vectors");
+    collections::vectors::work_with_vectors();
 }

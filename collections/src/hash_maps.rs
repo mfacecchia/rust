@@ -60,6 +60,12 @@ pub fn work_with_hashmaps() -> () {
 
     println!("Preference just updated!");
     println!("{os_preferences:#?}");
+
+    let incr_by: u32 = 10;
+    println!("Incrementing all preferences by {incr_by}");
+    increase_all(&mut os_preferences, incr_by);
+    println!("Done. Printing updated results");
+    println!("{os_preferences:#?}");
 }
 
 fn increase_preference(os_preference_count: &mut PreferenceData, increase_by: u32) -> () {
@@ -68,4 +74,16 @@ fn increase_preference(os_preference_count: &mut PreferenceData, increase_by: u3
 
     // The actual code that gets executed when accessing an enum's field is the following
     // (*os_preference_count).users_count
+}
+
+/// Increases by the amout of `incr_by` the preference over all items in the hashmap
+/// # Args
+///     preference [HashMap<String, PreferenceData>]: the preference hashmap
+///     incr_by [u32]: the incremental amount of all the preferences
+fn increase_all(preference: &mut HashMap<String, PreferenceData>, incr_by: u32) -> () {
+    // NOTE: Implicit dereferencing (can be seen as `(*preference).values_mut()`)
+    preference.values_mut().for_each(| entry | {
+        // NOTE: Implicit dereferencing
+        entry.users_count += incr_by;
+    });
 }
