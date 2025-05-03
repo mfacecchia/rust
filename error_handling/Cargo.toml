@@ -1,0 +1,15 @@
+[package]
+name = "error_handling"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+
+# NOTE: by default, the behavior of Rust in case of a panic is unwinding
+# Means that after a panic, Rust will cleanup the whole memory used in the program
+# by walking back every declared function and clearing the used memory.
+# To make the production build lighter it's possible to disable this functionality and
+# make the OS do the job for Rust. We can do so by setting the "abort" action for the "release" profile
+# (which is the profile used when we run `cargo build --release`)
+[profile.release]
+panic = 'abort'
