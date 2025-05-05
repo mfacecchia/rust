@@ -1,5 +1,7 @@
 use std::fmt::Debug;
 
+use generics::sample::{SampleStruct2, Summarizable2};
+
 // NOTE: Traits are something like what we call
 // "interfaces" in other programming languages
 // We can create some abstract methods, default methods,
@@ -16,6 +18,19 @@ trait Summarizable {
 // to use the same struct for multiple data types
 struct SampleStruct<T> {
     value: T
+}
+
+#[derive(Debug)]
+struct SampleStructNonGeneric {
+    value: u32
+}
+
+impl SampleStructNonGeneric {
+    fn new(value: u32) -> SampleStructNonGeneric {
+        SampleStructNonGeneric {
+            value
+        }
+    }
 }
 
 // NOTE: In order to use a generic in methods implementations we need to
@@ -50,6 +65,15 @@ impl Summarizable for SampleStruct<String> {
     }
 }
 
+// NOTE: It's possible to implement a trait for all structs
+// that implement a specific trait (or group of traits) as well
+// like in this example
+impl<T: Debug> Summarizable for T {
+    fn summarize(&self) -> () {
+        println!("Implementing this method for all structs that implement the `Debug` trait.");
+    }
+}
+
 // NOTE: This is not allowed because
 // only traits defined in the current scope can be implemented in local AND external structs and enums
 // and only structs defined in the local scope can implement traits defined in local AND external crates
@@ -78,6 +102,10 @@ fn random_summary_multiple_traits_alternative(value: &(impl Summarizable + Debug
     value.summarize();
 }
 
+fn build_summarizable() -> impl Summarizable2 + Debug {
+    SampleStruct2::new(5)
+}
+
 fn main() {
     let ss: SampleStruct<String> = SampleStruct::new(String::from("Remember to wash the dishes!"));
 
@@ -90,4 +118,7 @@ fn main() {
     ss.print_summary();
 
     random_summary(&ss);
+
+    let ssng = SampleStructNonGeneric::new(40);
+    ssng.summarize();
 }
