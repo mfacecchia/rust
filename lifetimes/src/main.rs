@@ -1,3 +1,13 @@
+// NOTE: It's possible to assign generic lifetimes in structs as well
+// In this case, we defined a `'a` generic lifetime on both the `title`, and `author`
+// (the `T: 'a`) syntax means that the if the generic type holds a reference,
+// then that reference MUST outlive `'a` (means that it MUST live at least as long as `'a`)
+#[derive(Debug)]
+struct Book<'a, T: 'a> {
+    title: &'a str,
+    author: T
+}
+
 fn main() {
     let str1 = String::from("Hello, world!");
     let result;
@@ -10,6 +20,27 @@ fn main() {
     // NOTE: `str2` goes out of scope so `result` will be invalidated as well
     // (possible returned pointer to be `str2` which is a dangling reference)
     // println!("{result}");
+
+    let title =  "Book title";
+    let new_book: Book<&str>;
+
+    {
+        let author = String::from("Feis ._.");
+
+        // NOTE: This won't work because `author` does not live long enough
+        // new_book = Book {
+        //     title,
+        //     author: &author
+        // }
+    }
+
+    let author = String::from("Feis._.");
+    // NOTE: This works instead because the lifetime of `author` is the same as `title`
+    new_book = Book {
+        title,
+        author: &author
+    };
+    println!("{new_book:?}");
 }
 
 // NOTE: Defining a generic lifetime. This serves as a lifetime relationship
