@@ -1,4 +1,4 @@
-use std::{ops::Deref, time::SystemTime};
+use std::{fs::File, ops::Deref, time::SystemTime};
 
 
 #[allow(dead_code)]
@@ -6,6 +6,7 @@ use std::{ops::Deref, time::SystemTime};
 struct Post {
     author: String,
     details: PostDetails,
+    image: Option<File>,
     likes: u32
 }
 
@@ -28,10 +29,11 @@ impl PostDetails {
 }
 
 impl Post {
-    fn new(author: &str, details: PostDetails, likes: u32) -> Post {
+    fn new(author: &str, details: PostDetails, image: Option<File>, likes: u32) -> Post {
         Post {
             author: author.to_owned(),
             details,
+            image, 
             likes
         }
     }
@@ -53,11 +55,36 @@ impl Deref for Post {
     }
 }
 
+// NOTE: By implementing the `Drop` trait on a struct like this,
+// we can define actions to execute before the struct is removed
+// from memory (e.g. goes out of scope or abruptedly dropped with the `drop()` method).
+// In this specific example, we are syncing the file data between stream and the actual
+// disk
+impl Drop for Post {
+    fn drop(&mut self) {
+        println!("---");
+        println!("Dropping the post.");
+        println!("Closing the file...");
+
+        if self.image.is_none() {
+            ()
+        }
+        let image_ptr = self.image.as_ref().unwrap();
+        if let Err(e) = image_ptr.sync_data() {
+            eprintln!("Error while writing to disk!");
+            eprintln!("{e}");
+        }
+        println!("Done!");
+        println!("---");
+    }
+}
+
 fn main() {
     let current_time_duration = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH);
 
     let my_post_details = PostDetails::new("I am writing code in Rust!", current_time_duration.unwrap().as_millis(), 1);
-    let my_new_post = Post::new("Feis._.", my_post_details, 2500);
+    let post_image = File::open("./src/assets/my_post_image.png").unwrap();
+    let my_new_post = Post::new("Feis._.", my_post_details, Some(post_image), 2500);
     // NOTE: Here, even though we are passing a `Post` and the function required a `PostDetails`,
     // Rust compiler is able to  coerce the information by calling the `deref` implemented method
     // (just like it does by default with `String` and `&str`!)
